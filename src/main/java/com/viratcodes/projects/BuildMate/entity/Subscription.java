@@ -10,20 +10,27 @@ import java.time.Instant;
 
 @Getter
 @Setter
-@FieldDefaults(level= AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Subscription {
+
     Long id;
 
     User user;
+
     Plan plan;
+
     SubscriptionStatus status;
+
     String stripeCustomerId;
+
     String stripeSubscriptionId;
 
     Instant currentPeriodStart;
-    Boolean cancelAtPeriodEnd;
+
+    Boolean cancelAtPeriodEnd = false;
 
     Instant createdAt;
+
     Instant updatedAt;
 
 }

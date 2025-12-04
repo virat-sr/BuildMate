@@ -11,15 +11,23 @@ import java.time.Instant;
 
 @Getter
 @Setter
-@FieldDefaults(level= AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
-     Long id;
-     String email;
-     String passwordHash;
-     String name;
-     String avatarUrl;
 
-     Instant createdAt; // Alternate for LocalDateTime
-     Instant deletedAt;
-     Instant updatedAt;
+    Long id;
+
+    String email;
+
+    String passwordHash;
+
+    String name;
+
+    String avatarUrl;
+
+    Instant createdAt; // Alternate for LocalDateTime
+
+    Instant deletedAt;
+
+    Instant updatedAt;
+
 }

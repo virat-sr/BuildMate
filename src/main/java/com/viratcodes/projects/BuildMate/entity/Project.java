@@ -9,14 +9,21 @@ import java.time.Instant;
 
 @Getter
 @Setter
-@FieldDefaults(level= AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Project {
+
     Long id;
+
     String name;
+
     User owner;
-    Boolean isPublic  = false;
+
+    Boolean isPublic = false;
+
     Instant createdAt;
+
     Instant updatedAt;
-    Instant deletedAt;
+
+    Instant deletedAt; //soft delete
 
 }
