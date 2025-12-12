@@ -1,6 +1,7 @@
 package com.viratcodes.projects.BuildMate.entity;
 
-import com.viratcodes.projects.BuildMate.SubscriptionStatus;
+
+import com.viratcodes.projects.BuildMate.enums.SubscriptionStatus;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;

@@ -2,7 +2,6 @@ package com.viratcodes.projects.BuildMate.controller;
 
 import com.viratcodes.projects.BuildMate.dto.member.InviteMemberRequest;
 import com.viratcodes.projects.BuildMate.dto.member.MemberResponse;
-import com.viratcodes.projects.BuildMate.entity.ProjectMember;
 import com.viratcodes.projects.BuildMate.service.ProjectMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,7 +18,7 @@ public class ProjectMemberController {
     private final ProjectMemberService projectMemberService;
 
     @GetMapping
-    public ResponseEntity<List<ProjectMember>> getProjectMembers(@PathVariable Long projectId) {
+    public ResponseEntity<List<MemberResponse>> getProjectMembers(@PathVariable Long projectId) {
 
         Long userId = 1L;
         return ResponseEntity.ok(projectMemberService.getProjectMembers(projectId, userId));
@@ -44,6 +43,7 @@ public class ProjectMemberController {
             @PathVariable Long memberId,
             @RequestBody InviteMemberRequest request
     ) {
+
         Long userId = 1L;
         return ResponseEntity.ok(
                 projectMemberService.updateMemberRole(projectId, memberId, request, userId)
@@ -52,14 +52,14 @@ public class ProjectMemberController {
     }
 
     @DeleteMapping("/{memberId}")
-    public ResponseEntity<MemberResponse> deleteProjectMember(
+    public ResponseEntity<Void> removeMember(
             @PathVariable Long projectId,
             @PathVariable Long memberId
     ) {
+
         Long userId = 1L;
-        return ResponseEntity.ok(
-                projectMemberService.deleteProjectMember(projectId, memberId, userId)
-        );
+        projectMemberService.removeProjectMember(projectId, memberId, userId);
+        return ResponseEntity.noContent().build();
 
     }
 

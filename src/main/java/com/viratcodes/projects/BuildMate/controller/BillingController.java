@@ -20,15 +20,18 @@ import java.util.List;
 public class BillingController {
 
     private final PlanService planService;
+
     private final SubscriptionService subscriptionService;
 
     @GetMapping("/api/plans")
     public ResponseEntity<List<PlanResponse>> getAllPlans() {
+
         return ResponseEntity.ok(planService.getAllActivePlans());
     }
 
     @GetMapping("api/me/subscription")
     public ResponseEntity<SubscriptionService> getMySubscription() {
+
         Long userId = 1L;
         return ResponseEntity.ok(subscriptionService.getCurrentSubscription(userId));
     }
@@ -37,18 +40,17 @@ public class BillingController {
     public ResponseEntity<CheckoutResponse> createCheckoutResponse(
             @RequestBody CheckoutRequest request
     ) {
+
         Long userId = 1L;
         return ResponseEntity.ok(subscriptionService.createCheckoutSessionUrl(request, userId));
     }
 
     @PostMapping("api/stripe/portal")
     public ResponseEntity<PortalResponse> openCustomerPortal() {
+
         Long userId = 1L;
         return ResponseEntity.ok(subscriptionService.openCustomerPortal(userId));
     }
-
-
-
 
 
 }
