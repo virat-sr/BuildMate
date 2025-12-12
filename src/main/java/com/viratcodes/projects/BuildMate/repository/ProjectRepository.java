@@ -21,7 +21,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     List<Project> findAllAccessibleByUser(@Param("userId") Long userId);
 
     @Query("""
-            SELECT p FROM PROJECT p,
+            SELECT p FROM Project p
             LEFT JOIN FETCH p.owner
             WHERE p.id = :projectId
                 AND p.deletedAt IS NULL
