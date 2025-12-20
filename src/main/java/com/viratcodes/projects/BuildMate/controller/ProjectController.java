@@ -4,6 +4,7 @@ import com.viratcodes.projects.BuildMate.dto.project.ProjectRequest;
 import com.viratcodes.projects.BuildMate.dto.project.ProjectResponse;
 import com.viratcodes.projects.BuildMate.dto.project.ProjectSummaryResponse;
 import com.viratcodes.projects.BuildMate.service.ProjectService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,14 +34,14 @@ public class ProjectController {
     }
 
     @PostMapping
-    public ResponseEntity<ProjectResponse> createProject(@RequestBody ProjectRequest request) {
+    public ResponseEntity<ProjectResponse> createProject(@RequestBody @Valid ProjectRequest request) {
 
         Long userId = 1L;
         return ResponseEntity.status(HttpStatus.CREATED).body(projectService.createProject(request, userId));
     }
 
     @PatchMapping
-    public ResponseEntity<ProjectResponse> updateProject(@PathVariable Long id, @RequestBody ProjectRequest request) {
+    public ResponseEntity<ProjectResponse> updateProject(@PathVariable Long id, @RequestBody @Valid ProjectRequest request) {
 
         Long userId = 1L;
         return ResponseEntity.ok(projectService.updateProject(id, request, userId));

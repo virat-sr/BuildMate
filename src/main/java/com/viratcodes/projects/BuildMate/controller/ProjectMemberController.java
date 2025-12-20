@@ -3,6 +3,7 @@ package com.viratcodes.projects.BuildMate.controller;
 import com.viratcodes.projects.BuildMate.dto.member.InviteMemberRequest;
 import com.viratcodes.projects.BuildMate.dto.member.MemberResponse;
 import com.viratcodes.projects.BuildMate.service.ProjectMemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +42,7 @@ public class ProjectMemberController {
     public ResponseEntity<MemberResponse> updateMemberRole(
             @PathVariable Long projectId,
             @PathVariable Long memberId,
-            @RequestBody InviteMemberRequest request
+            @RequestBody @Valid InviteMemberRequest request
     ) {
 
         Long userId = 1L;

@@ -4,8 +4,13 @@ import com.viratcodes.projects.BuildMate.dto.project.ProjectRequest;
 import com.viratcodes.projects.BuildMate.dto.project.ProjectResponse;
 import com.viratcodes.projects.BuildMate.dto.project.ProjectSummaryResponse;
 import com.viratcodes.projects.BuildMate.entity.Project;
+import com.viratcodes.projects.BuildMate.entity.ProjectMember;
+import com.viratcodes.projects.BuildMate.entity.ProjectMemberId;
 import com.viratcodes.projects.BuildMate.entity.User;
+import com.viratcodes.projects.BuildMate.enums.ProjectRole;
+import com.viratcodes.projects.BuildMate.error.ResourceNotFoundException;
 import com.viratcodes.projects.BuildMate.mapper.ProjectMapper;
+import com.viratcodes.projects.BuildMate.repository.ProjectMemberRepository;
 import com.viratcodes.projects.BuildMate.repository.ProjectRepository;
 import com.viratcodes.projects.BuildMate.repository.UserRepository;
 import com.viratcodes.projects.BuildMate.service.ProjectService;
@@ -30,16 +35,29 @@ public class ProjectServiceImpl implements ProjectService {
 
     ProjectMapper projectMapper;
 
+    ProjectMemberRepository projectMemberRepository;
+
     @Override
     public ProjectResponse createProject(ProjectRequest request, Long userId) {
 
-        User owner = userRepository.findById(userId).orElseThrow();
+        User owner = userRepository.findById(userId).orElseThrow(() -> new
+                ResourceNotFoundException("User", userId.toString()));
         Project project = Project.builder()
                 .name(request.name())
-                .owner(owner)
                 .isPublic(false)
                 .build();
         project = projectRepository.save(project);
+        ProjectMemberId projectMemberId = new ProjectMemberId(project.getId(), owner.getId());
+        ProjectMember projectMember = ProjectMember.builder()
+                .id(projectMemberId)
+                .projectRole(ProjectRole.OWNER)
+                .user(owner)
+                .acceptedAt(Instant.now())
+                .invitedAt(Instant.now())
+                .project(project)
+                .build();
+        projectMemberRepository.save(projectMember);
+
         return projectMapper.toProjectResponse(project);
 
     }
@@ -65,9 +83,7 @@ public class ProjectServiceImpl implements ProjectService {
     public ProjectResponse updateProject(Long id, ProjectRequest request, Long userId) {
 
         Project project = getAccessibleProjectById(id, userId);
-        if (!project.getOwner().getId().equals(userId)) {
-            throw new RuntimeException("You are not allowed to Update the name");
-        }
+
         project.setName(request.name());
         project = projectRepository.save(project);
         return projectMapper.toProjectResponse(project);
@@ -77,9 +93,7 @@ public class ProjectServiceImpl implements ProjectService {
     public void softDelete(Long id, Long userId) {
 
         Project project = getAccessibleProjectById(id, userId);
-        if (!project.getOwner().getId().equals(userId)) {
-            throw new RuntimeException("You are not allowed to Delete");
-        }
+
         project.setDeletedAt(Instant.now());
         projectRepository.save(project);
     }
@@ -88,7 +102,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     public Project getAccessibleProjectById(Long projectId, Long userId) {
 
-        return projectRepository.findAccessibleProjectById(projectId, userId).orElseThrow();
+        return projectRepository.findAccessibleProjectById(projectId, userId).orElseThrow(
+                () -> new ResourceNotFoundException("Project", projectId.toString()));
     }
 
 }
