@@ -24,3 +24,6 @@ logging:
     com.coding shuttle: DEBUG       # your package logs
     org.hibernate.SQL: DEBUG       # log SQL queries
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE  # log SQL parameters
+
+jwt:
+  secret-key: as9b7aodlbjfkluosfd789ujeklfnlsduf90hsdfbasdhji8qiqijvlckajdl

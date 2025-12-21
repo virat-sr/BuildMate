@@ -10,6 +10,7 @@ import com.viratcodes.projects.BuildMate.mapper.ProjectMemberMapper;
 import com.viratcodes.projects.BuildMate.repository.ProjectMemberRepository;
 import com.viratcodes.projects.BuildMate.repository.ProjectRepository;
 import com.viratcodes.projects.BuildMate.repository.UserRepository;
+import com.viratcodes.projects.BuildMate.security.AuthUtils;
 import com.viratcodes.projects.BuildMate.service.ProjectMemberService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +35,12 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
 
     UserRepository userRepository;
 
+    AuthUtils authUtils;
+
     @Override
-    public List<MemberResponse> getProjectMembers(Long projectId, Long userId) {
+    public List<MemberResponse> getProjectMembers(Long projectId) {
+
+        Long userId = authUtils.getCurrentUserId();
 
         Project project = getAccessibleProjectById(projectId, userId);
 
@@ -46,7 +51,9 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
-    public MemberResponse inviteMember(Long projectId, InviteMemberRequest request, Long userId) {
+    public MemberResponse inviteMember(Long projectId, InviteMemberRequest request) {
+
+        Long userId = authUtils.getCurrentUserId();
 
         Project project = getAccessibleProjectById(projectId, userId);
         User invitee = userRepository.findByUsername(request.username()).orElseThrow();
@@ -68,7 +75,9 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
-    public MemberResponse updateMemberRole(Long projectId, Long memberId, InviteMemberRequest request, Long userId) {
+    public MemberResponse updateMemberRole(Long projectId, Long memberId, InviteMemberRequest request) {
+
+        Long userId = authUtils.getCurrentUserId();
 
         Project project = getAccessibleProjectById(projectId, userId);
 
@@ -83,7 +92,9 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
-    public void removeProjectMember(Long projectId, Long memberId, Long userId) {
+    public void removeProjectMember(Long projectId, Long memberId) {
+
+        Long userId = authUtils.getCurrentUserId();
 
         Project project = getAccessibleProjectById(projectId, userId);
         ProjectMemberId projectMemberId = new ProjectMemberId(projectId, memberId);
