@@ -18,6 +18,7 @@ import com.viratcodes.projects.BuildMate.service.ProjectService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -80,20 +81,22 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectResponse getUserProjectsById(Long id) {
+    @PreAuthorize("@security.canViewProject(#projectId)")
+    public ProjectResponse getUserProjectsById(Long projectId) {
 
         Long userId = authUtils.getCurrentUserId();
-        Project project = getAccessibleProjectById(id, userId);
+        Project project = getAccessibleProjectById(projectId, userId);
         return projectMapper.toProjectResponse(project);
 
     }
 
     @Override
-    public ProjectResponse updateProject(Long id, ProjectRequest request) {
+    @PreAuthorize("@security.canEditProject(#projectId)")
+    public ProjectResponse updateProject(Long projectId, ProjectRequest request) {
 
         Long userId = authUtils.getCurrentUserId();
 
-        Project project = getAccessibleProjectById(id, userId);
+        Project project = getAccessibleProjectById(projectId, userId);
 
         project.setName(request.name());
         project = projectRepository.save(project);
@@ -101,11 +104,12 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void softDelete(Long id) {
+    @PreAuthorize("@security.canDeleteProject(#projectId)")
+    public void softDelete(Long projectId) {
 
         Long userId = authUtils.getCurrentUserId();
 
-        Project project = getAccessibleProjectById(id, userId);
+        Project project = getAccessibleProjectById(projectId, userId);
 
         project.setDeletedAt(Instant.now());
         projectRepository.save(project);

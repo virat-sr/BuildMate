@@ -15,6 +15,7 @@ import com.viratcodes.projects.BuildMate.service.ProjectMemberService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     AuthUtils authUtils;
 
     @Override
+    @PreAuthorize("@security.canViewMembers(#projectId)")
     public List<MemberResponse> getProjectMembers(Long projectId) {
 
         Long userId = authUtils.getCurrentUserId();
@@ -51,6 +53,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
+    @PreAuthorize("@security.canManageMembers(#projectId)")
     public MemberResponse inviteMember(Long projectId, InviteMemberRequest request) {
 
         Long userId = authUtils.getCurrentUserId();
@@ -75,6 +78,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
+    @PreAuthorize("@security.canManageMembers(#projectId)")
     public MemberResponse updateMemberRole(Long projectId, Long memberId, InviteMemberRequest request) {
 
         Long userId = authUtils.getCurrentUserId();
@@ -92,6 +96,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
+    @PreAuthorize("@security.canManageMembers(#projectId)")
     public void removeProjectMember(Long projectId, Long memberId) {
 
         Long userId = authUtils.getCurrentUserId();
