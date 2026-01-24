@@ -6,10 +6,7 @@ import com.stripe.model.EventDataObjectDeserializer;
 import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
-import com.viratcodes.projects.BuildMate.dto.subscription.CheckoutRequest;
-import com.viratcodes.projects.BuildMate.dto.subscription.CheckoutResponse;
-import com.viratcodes.projects.BuildMate.dto.subscription.PlanResponse;
-import com.viratcodes.projects.BuildMate.dto.subscription.PortalResponse;
+import com.viratcodes.projects.BuildMate.dto.subscription.*;
 import com.viratcodes.projects.BuildMate.service.PaymentProcessor;
 import com.viratcodes.projects.BuildMate.service.PlanService;
 import com.viratcodes.projects.BuildMate.service.SubscriptionService;
@@ -46,30 +43,30 @@ public class BillingController {
     }
 
     @GetMapping("/api/me/subscription")
-    public ResponseEntity<SubscriptionService> getMySubscription() {
+    public ResponseEntity<SubscriptionResponse> getMySubscription() {
 
-        Long userId = 1L;
-        return ResponseEntity.ok(subscriptionService.getCurrentSubscription(userId));
+        return ResponseEntity.ok(subscriptionService.getCurrentSubscription());
     }
 
     @PostMapping("/api/payments/checkout")
     public ResponseEntity<CheckoutResponse> createCheckoutResponse(
             @RequestBody CheckoutRequest request
     ) {
+
         return ResponseEntity.ok(paymentProcessor.createCheckoutSessionUrl(request));
     }
 
     @PostMapping("api/payments/portal")
     public ResponseEntity<PortalResponse> openCustomerPortal() {
 
-        Long userId = 1L;
-        return ResponseEntity.ok(paymentProcessor.openCustomerPortal(userId));
+        return ResponseEntity.ok(paymentProcessor.openCustomerPortal());
     }
 
     public ResponseEntity<String> handlePaymentWebhooks(
             @RequestBody String payload,
             @RequestHeader("Stripe-Signature") String sigHeader
     ) {
+
         try {
             Event event = Webhook.constructEvent(payload, sigHeader, webhookSecret);
             EventDataObjectDeserializer deserializer = event.getDataObjectDeserializer();
