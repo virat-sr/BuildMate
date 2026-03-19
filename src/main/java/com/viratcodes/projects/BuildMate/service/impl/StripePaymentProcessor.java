@@ -10,6 +10,7 @@ import com.viratcodes.projects.BuildMate.dto.subscription.PortalResponse;
 import com.viratcodes.projects.BuildMate.entity.Plan;
 import com.viratcodes.projects.BuildMate.entity.User;
 import com.viratcodes.projects.BuildMate.enums.SubscriptionStatus;
+import com.viratcodes.projects.BuildMate.error.BadRequestException;
 import com.viratcodes.projects.BuildMate.error.ResourceNotFoundException;
 import com.viratcodes.projects.BuildMate.repository.PlanRepository;
 import com.viratcodes.projects.BuildMate.repository.UserRepository;
@@ -70,9 +71,9 @@ public class StripePaymentProcessor implements PaymentProcessor {
             if (stripeCustomerId == null || stripeCustomerId.isEmpty()) {
                 params.setCustomerEmail(user.getUsername());
             } else {
-                params.setCustomer(stripeCustomerId);
+                params.setCustomer(stripeCustomerId); // stripe customer Id
             }
-            Session session = Session.create(params.build());
+            Session session = Session.create(params.build()); // making api call to the Stripe Backend
             return new CheckoutResponse(session.getUrl());
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -82,8 +83,25 @@ public class StripePaymentProcessor implements PaymentProcessor {
 
     @Override
     public PortalResponse openCustomerPortal() {
+        Long userId = authUtils.getCurrentUserId();
+        User user = getUser(userId);
+        String stripeCustomerId = user.getStripeCustomerId();
 
-        return null;
+        if (stripeCustomerId == null || stripeCustomerId.isEmpty()) {
+            throw new BadRequestException("User does not have a Stripe Customer Id, userId:" + userId);
+        }
+        try {
+            var portalSession = com.stripe.model.billingportal.Session.create(
+                    com.stripe.param.billingportal.SessionCreateParams.builder()
+                            .setCustomer(stripeCustomerId)
+                            .setReturnUrl(frontendUrl)
+                            .build()
+            );
+            return new PortalResponse(portalSession.getUrl());
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     @Override

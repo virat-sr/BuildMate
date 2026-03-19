@@ -10,13 +10,13 @@ import static com.viratcodes.projects.BuildMate.enums.ProjectPermission.*;
 @Getter
 @RequiredArgsConstructor
 public enum ProjectRole {
-    EDITOR(VIEW, EDIT, VIEW_MEMBERS),
+    EDITOR(VIEW, EDIT, DELETE, VIEW_MEMBERS),
     VIEWER(Set.of(VIEW, VIEW_MEMBERS)),
     OWNER(Set.of(VIEW, EDIT, DELETE, MANAGE_MEMBERS, VIEW_MEMBERS));
-
-    private final Set<ProjectPermission> permissions;
 
     ProjectRole(ProjectPermission... permissions) {
         this.permissions = Set.of(permissions);
     }
+
+    private final Set<ProjectPermission> permissions;
 }

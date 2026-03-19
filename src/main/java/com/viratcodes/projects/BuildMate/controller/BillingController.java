@@ -44,7 +44,6 @@ public class BillingController {
 
     @GetMapping("/api/me/subscription")
     public ResponseEntity<SubscriptionResponse> getMySubscription() {
-
         return ResponseEntity.ok(subscriptionService.getCurrentSubscription());
     }
 
@@ -58,7 +57,6 @@ public class BillingController {
 
     @PostMapping("api/payments/portal")
     public ResponseEntity<PortalResponse> openCustomerPortal() {
-
         return ResponseEntity.ok(paymentProcessor.openCustomerPortal());
     }
 

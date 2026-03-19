@@ -8,6 +8,7 @@ import com.viratcodes.projects.BuildMate.entity.ProjectMember;
 import com.viratcodes.projects.BuildMate.entity.ProjectMemberId;
 import com.viratcodes.projects.BuildMate.entity.User;
 import com.viratcodes.projects.BuildMate.enums.ProjectRole;
+import com.viratcodes.projects.BuildMate.error.BadRequestException;
 import com.viratcodes.projects.BuildMate.error.ResourceNotFoundException;
 import com.viratcodes.projects.BuildMate.mapper.ProjectMapper;
 import com.viratcodes.projects.BuildMate.repository.ProjectMemberRepository;
@@ -15,6 +16,7 @@ import com.viratcodes.projects.BuildMate.repository.ProjectRepository;
 import com.viratcodes.projects.BuildMate.repository.UserRepository;
 import com.viratcodes.projects.BuildMate.security.AuthUtils;
 import com.viratcodes.projects.BuildMate.service.ProjectService;
+import com.viratcodes.projects.BuildMate.service.SubscriptionService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -41,8 +43,14 @@ public class ProjectServiceImpl implements ProjectService {
 
     AuthUtils authUtils;
 
+    SubscriptionService subscriptionService;
+
     @Override
     public ProjectResponse createProject(ProjectRequest request) {
+
+        if(!subscriptionService.canCreateNewProject()) {
+            throw new BadRequestException("User cannot create a New Project with Current Plan, Upgrade your plan now.");
+        }
 
         Long userId = authUtils.getCurrentUserId();
 
