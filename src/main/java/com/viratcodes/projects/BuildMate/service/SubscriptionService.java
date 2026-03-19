@@ -12,7 +12,7 @@ public interface SubscriptionService {
 
     void activateSubscription(Long userId, Long planId, String subcriptionId, String customerId);
 
-    void updateSubscription(String subscriptionId, SubscriptionStatus status, Instant periodEnd, Boolean cancelAtPeriodEnd, Long planId);
+    void updateSubscription(String subscriptionId, SubscriptionStatus status, Instant periodStart,Instant periodEnd, Boolean cancelAtPeriodEnd, Long planId);
 
     void cancelSubscription(String subscriptionId);
 

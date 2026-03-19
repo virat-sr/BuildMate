@@ -13,6 +13,7 @@ import com.viratcodes.projects.BuildMate.repository.SubscriptionRepository;
 import com.viratcodes.projects.BuildMate.repository.UserRepository;
 import com.viratcodes.projects.BuildMate.security.AuthUtils;
 import com.viratcodes.projects.BuildMate.service.SubscriptionService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -71,13 +72,43 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public void updateSubscription(String subscriptionId, SubscriptionStatus status, Instant periodEnd, Boolean cancelAtPeriodEnd, Long planId) {
+    @Transactional
+    public void updateSubscription(String gatewaySubscriptionId, SubscriptionStatus status, Instant periodStart, Instant periodEnd, Boolean cancelAtPeriodEnd, Long planId) {
+        Subscription subscription = getSubscription(gatewaySubscriptionId);
+        boolean hasSubscriptionUpdated = false;
 
+        if(status != null && status!= subscription.getStatus()) {
+            subscription.setStatus(status);
+            hasSubscriptionUpdated = true;
+        }
+
+        if (periodStart != null && !periodStart.equals(subscription.getCurrentPeriodStart())) {
+            subscription.setCurrentPeriodStart(periodStart);
+            hasSubscriptionUpdated = true;
+        }
+
+        if (periodEnd != null && !periodEnd.equals(subscription.getCurrentPeriodEnd())) {
+            subscription.setCancelAtPeriodEnd(cancelAtPeriodEnd);
+            hasSubscriptionUpdated = true;
+        }
+
+        if(planId != null && !planId.equals(subscription.getPlan().getId())) {
+            Plan newPlan = getPlan(planId);
+            subscription.setPlan(newPlan);
+            hasSubscriptionUpdated = true;
+        }
+
+        if(hasSubscriptionUpdated) {
+            log.debug("Subscription has been updated : {}", gatewaySubscriptionId);
+            subscriptionRepository.save(subscription);
+        }
     }
 
     @Override
-    public void cancelSubscription(String subscriptionId) {
-
+    public void cancelSubscription(String gatewaySubscriptionId) {
+        Subscription subscription = getSubscription(gatewaySubscriptionId);
+        subscription.setStatus(SubscriptionStatus.CANCELED);
+        subscriptionRepository.save(subscription);
     }
 
     @Override
@@ -103,8 +134,16 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public boolean canCreateNewProject() {
+        Long userId = authUtils.getCurrentUserId();
+        SubscriptionResponse currentSubscription = getCurrentSubscription();
 
-        return false;
+        int countOfOwnedProjects = projectMemberRepository.countProjectOwnedByUser(userId);
+
+        if(currentSubscription.plan() == null) {
+            return countOfOwnedProjects < FREE_TIER_PROJECTS_ALLOWED;
+        }
+
+        return countOfOwnedProjects < currentSubscription.plan().maxProjects();
     }
 
     // Utility Methods
