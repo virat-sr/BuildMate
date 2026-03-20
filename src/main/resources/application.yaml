@@ -35,3 +35,12 @@ stripe:
     secret: whsec_fda5e4a20d736fbd010c9132794e4ade35d6f3534ee72864984b3fb0b67dbc40
 
 client.url: http://localhost:8080
+
+ai:
+  openai:
+    api-key:
+    base-url: https://openrouter.ai/api
+    chat:
+      options:
+        model: openai/gpt-5.2-codex
+        temperature: 0.0
