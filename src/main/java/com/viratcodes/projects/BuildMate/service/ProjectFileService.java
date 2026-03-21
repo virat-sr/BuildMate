@@ -2,14 +2,15 @@ package com.viratcodes.projects.BuildMate.service;
 
 import com.viratcodes.projects.BuildMate.dto.project.FileContentResponse;
 import com.viratcodes.projects.BuildMate.dto.project.FileNode;
-import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
-public interface FileService {
+public interface ProjectFileService {
 
     List<FileNode> getFileTree(Long projectId, Long userId);
 
     FileContentResponse getFileContent(Long projectId, String path, Long userId);
+
+    void saveFile(Long projectId, String filePath, String fileContent);
 
 }
