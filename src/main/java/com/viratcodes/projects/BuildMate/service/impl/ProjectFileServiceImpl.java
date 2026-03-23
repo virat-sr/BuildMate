@@ -9,6 +9,7 @@ import com.viratcodes.projects.BuildMate.mapper.ProjectFileMapper;
 import com.viratcodes.projects.BuildMate.repository.ProjectFileRepository;
 import com.viratcodes.projects.BuildMate.repository.ProjectRepository;
 import com.viratcodes.projects.BuildMate.service.ProjectFileService;
+import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,8 @@ import java.util.List;
 @Slf4j
 public class ProjectFileServiceImpl implements ProjectFileService {
 
+    private static final String BUCKET_NAME = "projects";
+
     private final ProjectRepository projectRepository;
 
     private final ProjectFileRepository projectFileRepository;
@@ -42,16 +45,28 @@ public class ProjectFileServiceImpl implements ProjectFileService {
 
 
     @Override
-    public List<FileNode> getFileTree(Long projectId, Long userId) {
+    public List<FileNode> getFileTree(Long projectId) {
 
         List<ProjectFile> projectFileList = projectFileRepository.findByProjectId(projectId);
         return projectFileMapper.toListOfFileNode(projectFileList);
     }
 
     @Override
-    public FileContentResponse getFileContent(Long projectId, String path, Long userId) {
+    public FileContentResponse getFileContent(Long projectId, String path) {
 
-        return null;
+        String objectName = projectId + "/" + path;
+        try (InputStream is = minioClient.getObject(GetObjectArgs.builder()
+                .bucket(BUCKET_NAME)
+                .object(objectName)
+                .build())) {
+            String content = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            return new FileContentResponse(path, content);
+
+
+        } catch (Exception e) {
+            log.error("Failed to read file: {}/{}", projectId, path, e);
+            throw new RuntimeException("Failed to read file content", e);
+        }
     }
 
     @Override

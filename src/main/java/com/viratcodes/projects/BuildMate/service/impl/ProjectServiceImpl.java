@@ -16,6 +16,7 @@ import com.viratcodes.projects.BuildMate.repository.ProjectRepository;
 import com.viratcodes.projects.BuildMate.repository.UserRepository;
 import com.viratcodes.projects.BuildMate.security.AuthUtils;
 import com.viratcodes.projects.BuildMate.service.ProjectService;
+import com.viratcodes.projects.BuildMate.service.ProjectTemplateService;
 import com.viratcodes.projects.BuildMate.service.SubscriptionService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -45,10 +46,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     SubscriptionService subscriptionService;
 
+    ProjectTemplateService projectTemplateService;
+
     @Override
     public ProjectResponse createProject(ProjectRequest request) {
 
-        if(!subscriptionService.canCreateNewProject()) {
+        if (!subscriptionService.canCreateNewProject()) {
             throw new BadRequestException("User cannot create a New Project with Current Plan, Upgrade your plan now.");
         }
 
@@ -71,6 +74,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .project(project)
                 .build();
         projectMemberRepository.save(projectMember);
+        projectTemplateService.initializeProjectFromTemplate(project.getId());
 
         return projectMapper.toProjectResponse(project);
 
